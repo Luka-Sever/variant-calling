@@ -58,17 +58,26 @@ void convert_sam_to_bam(const char* inputFile, const char* outputFile) {
 
     std::cout << "Konverzija uspješno završena!" << std::endl;
 }
-
+/*
+    pomoćna funkcija : reverse_comploment
+*/
+std::string reverse_complement(std::string seq) {
+    std::map<char,char> comp = {{'A','T'},{'T','A'},{'C','G'},{'G','C'}};
+    std::string temp;
+    for (char c : seq) temp.push_back(comp[c]);
+    std::reverse(temp.begin(), temp.end());
+    return temp;
+}
 /*
     parser sam-a, ako bude potrebno možemo dodavati još vrijednosti koje treba parsirati
 */
 std::vector<SamRecord> parse_sam(std::string filename){
     std::vector<SamRecord> records;
-    std::ifstream file(filename)
+    std::ifstream file(filename);
     if(!file.is_open()) throw std::runtime_error("Ne mogu otvoriti fajl: " + filename);
     std::string line;
     while (getline(file, line)){
-        if(line[0] == "@") continue;
+        if(line[0] == '@') continue;
 
         std::stringstream ss(line);
         std::string token;
@@ -78,7 +87,7 @@ std::vector<SamRecord> parse_sam(std::string filename){
         }
         SamRecord record;
         record.flag = std::stoi(columns[1]);
-        record.pos = std::stoi(columns[3] - 1); //  SAM je 1-based, pa zato -1 da imamo 0-based
+        record.pos = std::stoi(columns[3]) - 1; //  SAM je 1-based, pa zato -1 da imamo 0-based
         record.cigar = columns[5];
         record.seq = columns[9];
 
@@ -86,6 +95,7 @@ std::vector<SamRecord> parse_sam(std::string filename){
 
         if(record.cigar == "*") continue;
 
+        if(record.flag & 16) record.seq = reverse_complement(record.seq);
         records.push_back(record);
     }
     return records;

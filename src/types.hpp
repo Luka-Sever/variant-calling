@@ -25,5 +25,22 @@ struct SamRecord
     std::string seq; // procitana sekvenca
 };
 
+/*
+    Variant struktura
+*/
+struct Variant
+{
+    char type;
+    int pos;    // pozicija na referenci
+    std::string bases; //koja baza/e 
+};
+
+struct Mutation
+{
+    char type;
+    int pos;
+    std::string base; 
+};
+
 
 #endif
