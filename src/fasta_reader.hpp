@@ -17,7 +17,7 @@
     Kad smo prošli if petlju nastavljamo tako što stvaramo string genom i line. Genom koristimo kako bi u njega spremili
     cijeli genom, dok line koristimo kako bi u nju stavljali liniju fajla koje ćemo dodavati u genom. (linija 27)
     Pomću getline(file, line) uzimamo liniju po liniju i to radimo u while petlji sve dok nismo ostali bez linija. (linija 28)
-    Koristimo if provjeru ako fajl zapocinje s < to znaci da je header i ne treba nam u genomu pa ga ne dodajemo. (linija 28)
+    Koristimo if provjeru ako fajl zapocinje s > to znaci da je header i ne treba nam u genomu pa ga ne dodajemo. (linija 28)
     I na kraju veaćamo genom. (linija 30)
 */
 
@@ -25,7 +25,7 @@ std::string read_fasta(std::string path){
     std::ifstream file(path);
     if(!file.is_open()) throw std::runtime_error("Ne mogu otvoriti fajl: " + path);
     std::string genom, line;
-    while (std::getline(file, line)) if(!line.empty() && line[0] != '<') genom += line;
+    while (std::getline(file, line)) if(!line.empty() && line[0] != '>') genom += line;
 
     return genom;
 }

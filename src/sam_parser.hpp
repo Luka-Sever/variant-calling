@@ -1,6 +1,13 @@
+#ifndef SAM_PARSER_HPP
+#define SAM_PARSER_HPP
+
 #include <iostream>
 #include <string>
 #include <htslib/sam.h>
+#include <types.hpp>
+#include <vector>
+#include <fstream>
+#include <sstream>
 
 using namespace std;
 
@@ -51,3 +58,36 @@ void convert_sam_to_bam(const char* inputFile, const char* outputFile) {
 
     std::cout << "Konverzija uspješno završena!" << std::endl;
 }
+
+/*
+    parser sam-a, ako bude potrebno možemo dodavati još vrijednosti koje treba parsirati
+*/
+std::vector<SamRecord> parse_sam(std::string filename){
+    std::vector<SamRecord> records;
+    std::ifstream file(filename)
+    if(!file.is_open()) throw std::runtime_error("Ne mogu otvoriti fajl: " + filename);
+    std::string line;
+    while (getline(file, line)){
+        if(line[0] == "@") continue;
+
+        std::stringstream ss(line);
+        std::string token;
+        std::vector<std::string> columns;
+        while (ss >> token){
+            columns.push_back(token);
+        }
+        SamRecord record;
+        record.flag = std::stoi(columns[1]);
+        record.pos = std::stoi(columns[3] - 1); //  SAM je 1-based, pa zato -1 da imamo 0-based
+        record.cigar = columns[5];
+        record.seq = columns[9];
+
+        if(record.flag & 4) continue;
+
+        if(record.cigar == "*") continue;
+
+        records.push_back(record);
+    }
+    return records;
+}
+#endif
