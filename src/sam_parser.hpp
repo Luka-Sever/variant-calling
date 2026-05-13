@@ -59,7 +59,7 @@ void convert_sam_to_bam(const char* inputFile, const char* outputFile) {
     std::cout << "Konverzija uspješno završena!" << std::endl;
 }
 /*
-    pomoćna funkcija : reverse_comploment
+    pomoćna funkcija : reverse_complement
 */
 std::string reverse_complement(std::string seq) {
     std::map<char,char> comp = {{'A','T'},{'T','A'},{'C','G'},{'G','C'}};
