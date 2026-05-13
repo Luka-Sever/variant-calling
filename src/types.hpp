@@ -37,9 +37,9 @@ struct Variant
 
 struct Mutation
 {
-    char type;
     int pos;
-    std::string base; 
+    char alt_base;
+    int count; 
 };
 
 
