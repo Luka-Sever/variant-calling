@@ -20,7 +20,7 @@ int main(){
         allVariants.insert(allVariants.end(), v.begin(), v.end());
     }
 
-    // TO DOOO :)
-
-    std::vector<Mutation> mutations = variant_caller(all_variants, records, reference);
+    
+    // traženje mutacije i određivanje pogreške
+    std::vector<Mutation> mutations = variant_caller(records, reference);
 }
