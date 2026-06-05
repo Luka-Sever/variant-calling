@@ -17,6 +17,12 @@
     seq u kojoj se nalazi sekvenca.
 */
 
+enum MutationType {
+    SUBSTITUTION,
+    INSERTION,
+    DELETION
+};
+
 struct SamRecord
 {
     int flag; // za provjeru je li mapiran, reversed
@@ -38,9 +44,9 @@ struct Variant
 struct Mutation
 {
     int pos;
-    char alt_base;
     int count; 
+    char alt_base;
+    MutationType type;
 };
-
 
 #endif
