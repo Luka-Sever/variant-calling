@@ -4,12 +4,12 @@
 #include <iostream>
 #include <string>
 #include <htslib/sam.h>
-#include <types.hpp>
 #include <vector>
 #include <fstream>
 #include <sstream>
-
-using namespace std;
+#include <map>
+#include <algorithm>
+#include "types.hpp"
 
 /**
  * Pretvaramo sam datoteku u bam datoteku da samnjimo
@@ -24,16 +24,16 @@ void convert_sam_to_bam(const char* inputFile, const char* outputFile) {
     
     */
     samFile* file = sam_open(inputFile, "r");
-    if (!file) cout << "Ne mogu otvoriti datoteku.\n";
+    if (!file) std::cout << "Ne mogu otvoriti datoteku.\n";
 
     sam_hdr_t *header = sam_hdr_read(file);
-    if (!header) cout << "Ne mogu pročitati header.\n";
+    if (!header) std::cout << "Ne mogu pročitati header.\n";
 
     samFile *out = sam_open(outputFile, "wb");
-    if (!out) cout << "Ne mogu stvoriti bam datoteku header.\n";
+    if (!out) std::cout << "Ne mogu stvoriti bam datoteku header.\n";
 
     if (sam_hdr_write(out, header) < 0) 
-        cout << "Ne mogu pisati u bam datoteku.\n";
+        std::cout << "Ne mogu pisati u bam datoteku.\n";
 
 
     // Prazna bam1 struktura
