@@ -1,11 +1,11 @@
 #ifndef CIGAR_PARSER_HPP
 #define CIGAR_PARSER_HPP
 
-#include <types.hpp>
 #include <iostream>
 #include <vector>
 #include <regex>
 #include <string>
+#include "types.hpp"
 
 /*
     TO DOO: napraviti funkciju koja parsira CIGAR string :)
