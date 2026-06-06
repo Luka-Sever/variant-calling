@@ -12,7 +12,7 @@ using namespace std::string_literals;
 
 int main(int argc, char* argv[]){
     // početni argumenti
-    if (argc < 3) {
+    if (argc < 4) {
         std::cout << "Greška! Uporaba: " << argv[0] << " <putanja FASTA datoteke> <putanja očitanja> <putanja za spremanje>\n";
         exit(1); 
     }
@@ -54,6 +54,7 @@ int main(int argc, char* argv[]){
                 break;
             
             case MutationType::DELETION:
+                line.append(",-");
                 break;
         }
         
