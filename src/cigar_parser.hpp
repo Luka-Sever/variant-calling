@@ -8,48 +8,55 @@
 #include "types.hpp"
 
 /*
-    TO DOO: napraviti funkciju koja parsira CIGAR string :)
+    TODO: create a function that parses the CIGAR string :)
 
-    DOVRŠENO: Da!
-
+    DONE: Yes!
 */
-
 /*
-    opis: definiramo jedan regex niz u našem slučaju CIGAR string se sastoji od NIZA znamenki i JEDNOG slova (M, I, D, S, H).
-    Postavimo početne pozicije (ref_pos, read_pos) te za svaki prepoznat match za zadani regex i cigar string npr. 89M radimo sljedeće:
-    1. definiramo operaciju (uvijek na zadnjem mijestu m) i broj ponavljanja zadane operacije (repetition)
+    Description: we define a regex pattern; in our case, the CIGAR string consists of a SEQUENCE of digits
+    and a SINGLE letter (M, I, D, S, H). We set initial positions (ref_pos, read_pos),
+    and for each recognized match for the given regex and CIGAR string, e.g. 89M, we do the following:
 
-    2. ako je opearcija M:
-            može biti MISMATCH ili MATCH pa provjeravamo sve
-            ako je MISMATCH dodajemo jedan Variant ('X', ref_pos, s) u vektor 
-            povećavamo i ref_pos i read_pos
-    3. ako je opearcija I:
-            znaći baze postoje u seq ali ne i u referenci
-            dodajemo Variant ('I', ref_pos, niz baza) u vektor
-            povećavamo read_pos za repetition
-    4. ako je operacija D:
-            znaći baze ne postoje u seq ali postoje u referenci
-            dodajemo Variant ('D', ref_pos, "-") u vektor | *repetition
-            povećavamo ref_pos za jedan  | *repetition
-    5. ako je operacija S:
-            baze postoje ali nisu mapirane pa preskaćemo
-    6. ako je operacija H:
-            ignoriraj
+    1. Define the operation (always at the last position, e.g. 'M') and the number of repetitions of that operation.
+    2. If the operation is M:
+            it can be a MISMATCH or MATCH, so we check all cases
+            if it is a MISMATCH we add a Variant ('X', ref_pos, s) to the vector
+            we increment both ref_pos and read_pos
+
+    3. If the operation is I:
+            means bases exist in the sequence but not in the reference
+            we add a Variant ('I', ref_pos, list of bases) to the vector
+            we increase read_pos by repetition
+
+    4. If the operation is D:
+            means bases do not exist in the sequence but exist in the reference
+            we add a Variant ('D', ref_pos, "-") to the vector | *repetition
+            we increase ref_pos by one | *repetition
+
+    5. If the operation is S:
+            bases exist but are not mapped, so we skip them
+
+    6. If the operation is H:
+            ignore
+    
+   Written by: Ivan Dundović
 */
 std::vector<Variant>parse_cigar(SamRecord record, std::string reference){
     std::vector<Variant> variants;
+    // Defining the regex
     std::regex patrn("[0-9]+(M|I|D|S|H)");
     std::string exp = record.cigar;
     std::smatch match;
     int ref_pos = record.pos;
     int read_pos = 0;
-    
+    // Finding the CIGAR string using regex
     while (std::regex_search(exp, match, patrn))
     {
         std::string m = match.str();
         char operation = m[m.length() - 1];
         int repetition = std::stoi(m.substr(0, m.length() - 1));
         exp = match.suffix();
+        // Operations are described in detail above before the function definition starts
         if(operation == 'M'){
             int i = 0;
             while (i < repetition)
