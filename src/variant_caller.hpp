@@ -87,6 +87,8 @@ std::vector<Mutation> variant_caller(std::vector<SamRecord> records, std::string
                 // match
                 case 'M':
                     for (int i = 0; i < repetition; i++) {
+                        if (read_pos >= record.seq.length() || ref_pos >= reference.length()) break;
+
                         // koliko se baza poklapa s referencom
                         if (ref_pos >= 0 && ref_pos < (int)reference.length() &&
                             read_pos >= 0 && read_pos < (int)record.seq.length()) {
