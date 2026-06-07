@@ -2,6 +2,9 @@
 *.d
 
 .vscode/
+*.sam
+*.csv
+*.fasta
 
 # Compiled Object files
 *.slo
