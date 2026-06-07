@@ -34,7 +34,8 @@ int main(int argc, char* argv[]){
     // traženje mutacije i određivanje pogreške
     std::vector<Mutation> mutations = variant_caller(records, reference);
 
-    // psianje u CSV formatu
+    // pisanje u CSV formatu
+    // Napisao: Luka Sever
     std::string mutations_type[3] = {"X", "I", "D"};
     for (const auto& mutation : mutations) {
         std::string line;
