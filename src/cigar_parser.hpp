@@ -54,6 +54,7 @@ std::vector<Variant>parse_cigar(SamRecord record, std::string reference){
             int i = 0;
             while (i < repetition)
             {
+                if (read_pos >= record.seq.length() || ref_pos >= reference.length()) break;
                 if(record.seq[read_pos] != reference[ref_pos]){
                     std::string s(1, record.seq[read_pos]);
                     Variant v = {'X', ref_pos, s};
@@ -64,17 +65,19 @@ std::vector<Variant>parse_cigar(SamRecord record, std::string reference){
                 read_pos++;
             }    
         }else if (operation == 'I'){
-            std::string bases = record.seq.substr(read_pos, repetition);
-            Variant v = {'I', ref_pos, bases};
+            if (read_pos + repetition <= record.seq.length()) {
+                std::string bases = record.seq.substr(read_pos, repetition);
+                Variant v = {'I', ref_pos, bases};
+                variants.push_back(v);
+            }
             read_pos += repetition;
-            variants.push_back(v);
 
         }else if(operation == 'D'){
             for(int i =0; i < repetition; i++){
                 Variant v = {'D', ref_pos, "-"};
-                ref_pos++;
                 variants.push_back(v);
             }
+            ref_pos += repetition;
 
         }else if(operation == 'S') read_pos += repetition;
         else if(operation == 'H') continue;
