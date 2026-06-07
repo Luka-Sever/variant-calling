@@ -3,48 +3,46 @@
 #include <string>
 
 /*
-    TO DOO:
-    1. Dodati sve tipove što će nam trebati. :)
+    TODO:
+    1. Add all the types we will need. :)
 
-    DOVRŠENO: MOŽDA
+    DONE: YES
 */
-/*
-    SamRecord struktura
-    Detaljniji opis:
-    Sadrži varijablu flag tipa int koja predstavlja vrijednost zastavice u .sam fajlu.
-    (Značenje zastavica: 0 -> read je pravilno mapiran, 4 -> read nije mapiran, 16 -> read je u reversu)
-    Zatim imamo int pos koja predstavlja poziciju na referenci, te dva stringa cigar u kojem se nalazi cigar string te
-    seq u kojoj se nalazi sekvenca.
-*/
-
+// Enumeration of mutation types
+// Written by: Luka Sever
 enum MutationType {
     SUBSTITUTION,
     INSERTION,
     DELETION
 };
 
+// Structure representing a SAM record
+// Written by: Ivan Dundović
 struct SamRecord
 {
-    int flag; // za provjeru je li mapiran, reversed
-    int pos; // pozicija na referenci
-    std::string cigar; // cigar string tipa "5M2I3M1D4M"
-    std::string seq; // procitana sekvenca
+    int flag; // indicates whether the read is mapped, reversed, etc.
+    int pos; // position on the reference
+    std::string cigar; // CIGAR string (e.g. "5M2I3M1D4M")
+    std::string seq; // read sequence
 };
 
 /*
-    Variant struktura
+    Variant structure
+    Written by: Ivan Dunodvić
 */
 struct Variant
 {
     char type;
-    int pos;    // pozicija na referenci
-    std::string bases; //koja baza/e 
+    int pos;    // position on the reference
+    std::string bases; // which base(s)
 };
 
+// Structure representing a mutation
+// Written by: Luka Sever
 struct Mutation
 {
     int pos;
-    int count; 
+    int count;
     char alt_base;
     MutationType type;
 };
