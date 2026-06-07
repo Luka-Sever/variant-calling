@@ -5,7 +5,8 @@
 #include <vector>
 #include "types.hpp"
 
-// vraća indeks slova
+// Returns the index of the character
+// Written by: Luka Sever
 int base_to_index(char base) {
     switch (base)
     {
@@ -26,7 +27,8 @@ int base_to_index(char base) {
     }
 }
 
-// funkcija vraća bazu od indeksa
+// Function returns the base at the given index
+// Written by: Luka Sever
 char index_to_base(int index) {
     switch(index) {
         case 0: return 'A';
@@ -37,59 +39,60 @@ char index_to_base(int index) {
     }
 }
 
+// Base pileup structure
 typedef struct BasePileup {
-    int count[5] = {0}; // A, C, G, T ili Unkown
+    int count[5] = {0}; // A, C, G, T or Unknown
     int insertion_count = 0;
     int deletion_count = 0;
 } BasePileup;
 
-// glavna funkcija određivanja mutacija, vraća
-// vektor objekata mutacija
-// Napisao: Luka Sever
+// Main function for determining mutations, returns
+// a vector of mutation objects
+// Written by: Luka Sever
 std::vector<Mutation> variant_caller(std::vector<SamRecord> records, std::string reference) {
     std::vector<Mutation> mutations;
 
-    // za svaki slučaj
+    // Just in case
     if (reference.empty()) return mutations;
 
-    // struktura u kojoj se broje reference
+    // Structure used to count references
     std::vector<BasePileup> pileup(reference.length());
 
-    // olakšano čitanje CIGAR stringa
+    // Simplifies reading the CIGAR string
     std::regex patrn("[0-9]+(M|I|D|S|H)");
     for (const auto &record : records) {
 
-        // ne zanimaju nas nepreslikani redovi
+        // We are not interested in unmapped reads
         if (record.flag & 4) continue;
         if (record.cigar == "*") continue;
 
-        // zanima nas pozicija u referentnom genomu
-        // i pozicija koju trenutno čitamo
+        // We are interested in the position in the reference genome
+        // and the current read position
         int ref_pos = record.pos;
         int read_pos = 0;
 
-        // pratimo CIGAR string, čitat ćemo kakve su promjene u očitanju
+        // We follow the CIGAR string to read the changes in the alignment
         std::string exp = record.cigar;
         std::smatch match;
         
-        // dok nismo do kraja pretražili koliko očitanja ima isti CIGAR
+        // While we haven't finished processing all reads with the same CIGAR
         while(std::regex_search(exp, match, patrn)) {
-            // rezultat koji smo dobili
+            // The result we obtained
             std::string m = match.str();
-            // koja operacija
+            // Which operation
             char operation = m[m.length() - 1];
-            // koliko puta se ponavlja
+            // How many times it is repeated
             int repetition = std::stoi(m.substr(0, m.length() - 1));
             exp = match.suffix();
 
-            // za određene operacije 
+            // For specific operations 
             switch (operation) {
                 // match
                 case 'M':
                     for (int i = 0; i < repetition; i++) {
                         if (read_pos >= record.seq.length() || ref_pos >= reference.length()) break;
 
-                        // koliko se baza poklapa s referencom
+                        // How many bases match the reference
                         if (ref_pos >= 0 && ref_pos < (int)reference.length() &&
                             read_pos >= 0 && read_pos < (int)record.seq.length()) {
 
@@ -104,7 +107,7 @@ std::vector<Mutation> variant_caller(std::vector<SamRecord> records, std::string
                         }
                         break;
                 
-                // umetanje
+                // Insertion
                 case 'I':
                     if (ref_pos >= 0 && ref_pos < (int)reference.length()) {
                         pileup[ref_pos].insertion_count++;
@@ -112,7 +115,7 @@ std::vector<Mutation> variant_caller(std::vector<SamRecord> records, std::string
                     read_pos += repetition;
                     break;
                     
-                // brisanje
+                // Deletion
                 case 'D':
                     if (ref_pos >= 0 && ref_pos < (int)reference.length())  {
                         pileup[ref_pos].deletion_count++;
@@ -120,7 +123,7 @@ std::vector<Mutation> variant_caller(std::vector<SamRecord> records, std::string
                     ref_pos += repetition;
                     break;
                     
-                // substitucija
+                // Substitution
                 case 'S':
                     read_pos += repetition;
                     break;
@@ -132,11 +135,11 @@ std::vector<Mutation> variant_caller(std::vector<SamRecord> records, std::string
             }
         }
 
-        // glavni parametri očitanja,
-        // depth nam govori koliko očitanja imamo,
-        // a frekvencija govori koliko nam treba
-        // da zaključimo da se dogodila mutacija
-        // (postavljeno na 50%)
+        // Main read parameters,
+        // depth indicates how many reads we have,
+        // and frequency indicates how much is needed
+        // to conclude that a mutation has occurred
+        // (set to 50%)
         const int MIN_DEPTH = 1;
         const float MIN_FREQ = 0.5f;
 
@@ -144,7 +147,7 @@ std::vector<Mutation> variant_caller(std::vector<SamRecord> records, std::string
         for (int pos = 0; pos < (int)reference.length(); pos++) {
             int ref_base_index = base_to_index(reference[pos]);
             
-            // koliko je velika substitucija
+            // Size of the substitution
             int substitute_depth = 0;
             for (int i = 0; i < 5; i++) {
                 substitute_depth += pileup[pos].count[i];
@@ -162,7 +165,7 @@ std::vector<Mutation> variant_caller(std::vector<SamRecord> records, std::string
                 }
             }
             //
-            // Odluka: je li umetanje, brisanje ili substitucija
+            // Decision: whether it is an insertion, deletion, or substitution
             //
             if (pileup[pos].insertion_count > max_index && pileup[pos].insertion_count > pileup[pos].deletion_count) {
                 float freq = (float)pileup[pos].insertion_count / total_depth;
