@@ -66,6 +66,9 @@ std::vector<Variant>parse_cigar(SamRecord record, std::string reference){
                     std::string s(1, record.seq[read_pos]);
                     Variant v = {'X', ref_pos, s};
                     variants.push_back(v);
+                } else{
+                    Variant v = {'=', ref_pos, ""};
+                    variants.push_back(v);
                 }
                 i++;
                 ref_pos++;
